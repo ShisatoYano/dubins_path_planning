@@ -4,9 +4,7 @@ using namespace std;
 
 float deg2rad(float deg)
 {
-    float rad;
-
-    return rad = deg * M_PI / 180.0;
+    return (deg * M_PI / 180.0);
 }
 
 int main()
