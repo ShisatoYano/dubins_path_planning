@@ -7,6 +7,20 @@ float deg2rad(float deg)
     return (deg * M_PI / 180.0);
 }
 
+float mod2pi(float theta)
+{
+    return (theta - 2.0 * M_PI * floor(theta / 2.0 / M_PI));
+}
+
+float pi_2_pi(float angle)
+{
+    if (angle >= M_PI) {angle -= 2.0 * M_PI;}
+
+    if (angle <= -M_PI) {angle += 2.0 * M_PI;}
+
+    return angle;
+}
+
 class DubinsPath
 {
 private:
@@ -40,6 +54,12 @@ public:
 
     void planning_from_origin(float lgx, float lgy, float lgyaw)
     {
+        // normalize
+        float dx = lgx;
+        float dy = lgy;
+        float D = sqrt(dx * dx + dy * dy);
+        float d = D / curvature;
+
 
     }
 
