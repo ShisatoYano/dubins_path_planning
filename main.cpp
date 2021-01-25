@@ -200,9 +200,8 @@ public:
     float curvature;
 
     // output
-    vector<float> ox;
-    vector<float> oy;
-    vector<float> oyaw;
+    vector<float> px, py, pyaw;
+    vector<float> ox, oy, oyaw;
     float ocost;
     string mode;
 
@@ -300,6 +299,30 @@ public:
         }
 
         // generate course
+        float length[3] = {bt, bp, bq};
+    }
+
+    void generate_course(float length[], string bmode, float c)
+    {
+        float pd, d;
+
+        px.push_back(0.0);
+        py.push_back(0.0);
+        pyaw.push_back(0.0);
+
+        for (int i = 0; i < 3; ++i) {
+            pd = 0.0;
+            if (bmode[i] == 'S') {d = 1.0 / c;}
+            else {d = deg2rad(3.0);}
+
+            while (pd < abs(length[i] - d))
+            {
+                px.push_back(px.back() + d * c * cos(pyaw.back()));
+                py.push_back(py.back() + d * c * sin(pyaw.back()));
+
+                if (bmode[i] == 'L') {pyaw.push_back(pyaw.back() + d);}
+            }
+        }
     }
 
     void planning()
