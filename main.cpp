@@ -40,7 +40,7 @@ public:
         float p_squared = 2 + (d * d) - (2 * c_ab) + (2 * d * (sa - sb));
         if (p_squared < 0)
         {
-            t = NULL; p = NULL; q = NULL;
+            t = 0.0; p = 0.0; q = 0.0;
         }
         float tmp1 = atan2((cb - ca), tmp0);
         t = mod2pi(-alpha + tmp1);
@@ -68,7 +68,7 @@ public:
         float p_squared = 2 + (d * d) - (2 * c_ab) + (2 * d * (sb - sa));
         if (p_squared < 0)
         {
-            t = NULL; p = NULL; q = NULL;
+            t = 0.0; p = 0.0; q = 0.0;
         }
         float tmp1 = atan2((ca - cb), tmp0);
         t = mod2pi(alpha - tmp1);
@@ -95,7 +95,7 @@ public:
         float p_squared = -2 + (d * d) + (2 * c_ab) + (2 * d * (sa + sb));
         if (p_squared < 0)
         {
-            t = NULL; p = NULL; q = NULL;
+            t = 0.0; p = 0.0; q = 0.0;
         }
         p = sqrt(p_squared);
         float tmp2 = atan2((-ca - cb), (d + sa + sb)) - atan2(-2.0, p);
@@ -122,7 +122,7 @@ public:
         float p_squared = (d * d) - 2 + (2 * c_ab) - (2 * d * (sa + sb));
         if (p_squared < 0)
         {
-            t = NULL; p = NULL; q = NULL;
+            t = 0.0; p = 0.0; q = 0.0;
         }
         p = sqrt(p_squared);
         float tmp2 = atan2((ca + cb), (d - sa - sb)) - atan2(2.0, p);
@@ -149,7 +149,7 @@ public:
         float tmp_rlr = (6.0 - d * d + 2.0 * c_ab + 2.0 * d * (sa - sb)) / 8.0;
         if (abs(tmp_rlr) > 1.0)
         {
-            t = NULL; p = NULL; q = NULL;
+            t = 0.0; p = 0.0; q = 0.0;
         }
         p = mod2pi(2 * M_PI - acos(tmp_rlr));
         t = mod2pi(alpha - atan2(ca - cb, d - sa + sb) + mod2pi(p / 2.0));
@@ -175,7 +175,7 @@ public:
         float tmp_lrl = (6.0 - d * d + 2 * c_ab + 2 * d * (-sa + sb)) / 8.0;
         if (abs(tmp_lrl) > 1)
         {
-            t = NULL; p = NULL; q = NULL;
+            t = 0.0; p = 0.0; q = 0.0;
         }
         p = mod2pi(2 * M_PI - acos(tmp_lrl));
         t = mod2pi(-alpha - atan2(ca - cb, d + sa - sb) + p / 2.0);
@@ -228,12 +228,12 @@ public:
         // initialize cost
         float bcost = INFINITY;
         float cost;
-        float bt = NULL, bp = NULL, bq = NULL;
-        string bmode = NULL;
+        float bt = 0.0, bp = 0.0, bq = 0.0;
+        string bmode = "NUL";
 
         // planners
         LSL lsl = LSL(alpha, beta, d);
-        if (lsl.t != NULL)
+        if (lsl.t != 0.0)
         {
             cost = abs(lsl.t) + abs(lsl.p) + abs(lsl.q);
             if (bcost > cost)
@@ -244,7 +244,7 @@ public:
         }
 
         RSR rsr = RSR(alpha, beta, d);
-        if (rsr.t != NULL)
+        if (rsr.t != 0.0)
         {
             cost = abs(rsr.t) + abs(rsr.p) + abs(rsr.q);
             if (bcost > cost)
@@ -255,7 +255,7 @@ public:
         }
 
         LSR lsr = LSR(alpha, beta, d);
-        if (lsr.t != NULL)
+        if (lsr.t != 0.0)
         {
             cost = abs(lsr.t) + abs(lsr.p) + abs(lsr.q);
             if (bcost > cost)
@@ -266,7 +266,7 @@ public:
         }
 
         RSL rsl = RSL(alpha, beta, d);
-        if (rsl.t != NULL)
+        if (rsl.t != 0.0)
         {
             cost = abs(rsl.t) + abs(rsl.p) + abs(rsl.q);
             if (bcost > cost)
@@ -277,7 +277,7 @@ public:
         }
 
         RLR rlr = RLR(alpha, beta, d);
-        if (rlr.t != NULL)
+        if (rlr.t != 0.0)
         {
             cost = abs(rlr.t) + abs(rlr.p) + abs(rlr.q);
             if (bcost > cost)
@@ -288,7 +288,7 @@ public:
         }
 
         LRL lrl = LRL(alpha, beta, d);
-        if (lrl.t != NULL)
+        if (lrl.t != 0.0)
         {
             cost = abs(lrl.t) + abs(lrl.p) + abs(lrl.q);
             if (bcost > cost)
@@ -300,6 +300,7 @@ public:
 
         // generate course
         float length[3] = {bt, bp, bq};
+        generate_course(length, bmode, curvature);
     }
 
     void generate_course(float length[], string bmode, float c)
@@ -321,7 +322,18 @@ public:
                 py.push_back(py.back() + d * c * sin(pyaw.back()));
 
                 if (bmode[i] == 'L') {pyaw.push_back(pyaw.back() + d);}
+                else if (bmode[i] == 'S') {pyaw.push_back(pyaw.back());}
+                else if (bmode[i] == 'R') {pyaw.push_back(pyaw.back() - d);}
+                pd += d;
             }
+            d = length[i] - pd;
+            px.push_back(px.back() + d * c * cos(pyaw.back()));
+            py.push_back(py.back() + d * c * sin(pyaw.back()));
+
+            if (bmode[i] == 'L') {pyaw.push_back(pyaw.back() + d);}
+            else if (bmode[i] == 'S') {pyaw.push_back(pyaw.back());}
+            else if (bmode[i] == 'R') {pyaw.push_back(pyaw.back() - d);}
+            pd += d;
         }
     }
 
@@ -334,6 +346,11 @@ public:
         float lgyaw = goal_yaw - start_yaw;
 
         planning_from_origin(lgx, lgy, lgyaw);
+
+        // path output
+        for (int i = 0; i < px.size(); ++i) {
+
+        }
     }
 };
 
