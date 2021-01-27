@@ -7,6 +7,11 @@ float deg2rad(float deg)
     return (deg * M_PI / 180.0);
 }
 
+float rad2deg(float rad)
+{
+    return (rad * 180.0 / M_PI);
+}
+
 float mod2pi(float theta)
 {
     return (theta - 2.0 * M_PI * floor(theta / 2.0 / M_PI));
@@ -348,8 +353,19 @@ public:
         planning_from_origin(lgx, lgy, lgyaw);
 
         // path output
+        float x, y, yaw;
         for (int i = 0; i < px.size(); ++i) {
+            x = cos(-start_yaw) * px[i] + sin(-start_yaw) * py[i] + start_x;
+            y = -sin(-start_yaw) * px[i] + cos(-start_yaw) * py[i] + start_y;
+            yaw = pi_2_pi(pyaw[i] + start_yaw);
+            ox.push_back(x);
+            oy.push_back(y);
+            oyaw.push_back(yaw);
+        }
 
+        // print path
+        for (int i = 0; i < ox.size(); ++i) {
+            cout << "(" << ox[i] << ", " << oy[i] << ", " << rad2deg(oyaw[i]) << ")" << endl;
         }
     }
 };
